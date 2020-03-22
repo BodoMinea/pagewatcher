@@ -27,7 +27,7 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `watchers` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `friendly_name` varchar(100) COLLATE utf8_bin NOT NULL,
   `url` varchar(3000) COLLATE utf8_bin NOT NULL,
   `check_interval` int(11) NOT NULL,
@@ -40,7 +40,8 @@ CREATE TABLE `watchers` (
   `last_content` mediumtext COLLATE utf8_bin NOT NULL,
   `alert_email` tinyint(1) DEFAULT NULL,
   `alert_webhooks` tinyint(1) DEFAULT NULL,
-  `alert_syshooks` tinyint(1) DEFAULT NULL
+  `alert_syshooks` tinyint(1) DEFAULT NULL,
+  PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
