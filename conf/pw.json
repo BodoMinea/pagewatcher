@@ -24,5 +24,12 @@
                   "from": "<< FROM EMAIL ADDRESS >>",
                   "to": "<< TO EMAIL ADDRESS >>"
                 }
-        }
+        },
+	"webhooks": [
+		{
+			"url": "<< YOUR URL THAT GETS AN GET /...&paramName=... >>",
+			"method": "GET",
+			"paramName": "text"
+		}
+	]
 }
