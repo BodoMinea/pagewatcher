@@ -18,18 +18,98 @@ app.use(basicAuth({
     realm: "Pagewatcher"
 }))
 
+function randomIntFromInterval(min, max) { // min and max included 
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
 var transporter = nodemailer.createTransport(config.mail.transport);
 var mailoptions = config.mail.options;
 
 const connection = mysql.createConnection(config.mysqldb);
 
-/* transporter.sendMail(mailOptions, function(error, info){
-                if (error) {
-                   process.exit();
-                } else {
-                   process.exit();
-                }
-        }); */
+function sendEmail(obj){
+	mailoptions.subject="Page change alert for "+obj.friendly_name;
+	mailoptions.text="Page change alert triggered at "+new Date()+" for "+obj.friendly_name+" at URL "+obj.url+" by the PageWatcher instance at "+config.server.host;
+
+	transporter.sendMail(mailoptions, function(error, info){
+	});
+}
+
+function sendWebhooks(){
+
+}
+
+function sendSyshooks(){
+
+}
+
+function checkForChanges(id){
+	console.log('Now checking '+id);
+	connection.query(
+	  'SELECT * FROM `watchers` WHERE id='+id,
+	  function(err, results, fields) {
+	  	(function(v,id){
+	  		request(v.url, function (error, response, last_content) {
+				if(v.last_content!=last_content){
+					console.log('Changed!');
+					if(v.alert_email){ sendEmail(v); }
+					if(v.alert_webhooks){ sendWebhooks(v); }
+					if(v.alert_syshooks){ sendSyshooks(v); }
+				}else{
+					console.log('Not changed!');
+				}
+			connection.execute('UPDATE `watchers` SET `checked_times`=?,`last_content`=? WHERE id=?', [v.checked_times+1,last_content,id], (err, rows) => { });
+
+			if(v.inexact_timing){
+					interval = randomIntFromInterval((v.check_interval-(v.check_interval*(15/100)))*1000,(v.check_interval+(v.check_interval*(15/100)))*1000);
+					intervals[v.id] = setTimeout(checkForChanges.bind(null,v.id),interval*1000);
+					console.log('Next scheduled check for '+v.id+' in '+interval);
+				}else{
+					console.log('Next scheduled check for '+v.id+' in '+v.check_interval*1000);
+					intervals[v.id] = setTimeout(checkForChanges.bind(null,v.id),v.check_interval*1000);
+				}
+		});
+	  	})(results[0],id)
+	  	
+	  }
+	);
+}
+
+function addTimers(par){
+	if(!par){
+		console.log('Adding timers for stored watchers.');
+		connection.query(
+		  'SELECT * FROM `watchers`',
+		  function(err, results, fields) {
+		  	for (var i = 0; i < results.length; i++) {
+		  		checkForChanges(results[i].id);
+		  	}
+		  }
+		);
+	}else{
+		console.log('Adding timer for last added');
+		connection.query(
+		  'SELECT * FROM `watchers` ORDER BY id DESC',
+		  function(err, results, fields) {
+		  		if(results[0].inexact_timing){
+		  			interval = randomIntFromInterval((results[0].check_interval-(results[0].check_interval*(15/100)))*1000,(results[0].check_interval+(results[0].check_interval*(15/100)))*1000);
+		  			intervals[results[0].id] = setTimeout(checkForChanges.bind(null,results[0].id),interval);
+		  			console.log('First scheduled check for '+results[0].id+' in '+interval);
+		  		}else{
+		  			console.log('First scheduled check for '+results[0].id+' in '+results[0].check_interval*1000);
+		  			intervals[results[0].id] = setTimeout(checkForChanges.bind(null,results[0].id),results[0].check_interval*1000);
+		  		}
+		  	}
+		);
+	}
+}
+
+function clearTimers(){
+	for (var i = 0; i < intervals.length; i++) {
+		if(intervals[i]) clearTimeout(intervals[i]);
+		console.log('All timers cleared');
+	}
+}
 
 app.get('*', function(req, res) {
     res.sendFile('app/index.html', { root: __dirname });
@@ -68,11 +148,13 @@ io.on('connection', function(socket){
     		obj[data[i].name] = data[i].value=="on"?1:0;
     	} else obj[data[i].name] = data[i].value;
     }
-    request('http://www.google.com', function (error, response, last_content) {
+    request(obj.url, function (error, response, last_content) {
+    	console.log(obj.friendly_name,obj.url,obj.check_interval,obj.inexact_timing,obj.add_user,obj.add_ip,last_content,obj.alert_email,obj.alert_webhooks,obj.alert_syshooks);
     	connection.execute('INSERT INTO `watchers`(`friendly_name`,`url`,`check_interval`,`inexact_timing`,`add_user`,`add_ip`,`last_content`,`alert_email`,`alert_webhooks`,`alert_syshooks`) VALUES (?,?,?,?,?,?,?,?,?,?)', [obj.friendly_name,obj.url,obj.check_interval,obj.inexact_timing,obj.add_user,obj.add_ip,last_content,obj.alert_email,obj.alert_webhooks,obj.alert_syshooks], (err, rows) => {
 		  if(!err){
 		  	loadSendAll();
 		  	io.emit('ok');
+		  	addTimers(1);
 		  }else{
 		  	io.emit('error');
 		  	console.log(err);
@@ -111,6 +193,7 @@ io.on('connection', function(socket){
   });
   socket.on('delete', function(id){
 	connection.execute('DELETE FROM `watchers` WHERE id = ?', [id], (err, rows) => {
+	  clearTimeout(intervals[parseInt(id)]);
 	  if(!err){
 	  	loadSendAll();
 	  	io.emit('ok');
@@ -123,3 +206,4 @@ io.on('connection', function(socket){
 });
 
 http.listen(port, () => console.log(`Pagewatcher app listening on port ${port}!`))
+addTimers();
