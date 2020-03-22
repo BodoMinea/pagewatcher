@@ -67,7 +67,7 @@ function checkForChanges(id){
 
 			if(v.inexact_timing){
 					interval = randomIntFromInterval((v.check_interval-(v.check_interval*(15/100)))*1000,(v.check_interval+(v.check_interval*(15/100)))*1000);
-					intervals[v.id] = setTimeout(checkForChanges.bind(null,v.id),interval*1000);
+					intervals[v.id] = setTimeout(checkForChanges.bind(null,v.id),interval);
 					console.log('Next scheduled check for '+v.id+' in '+interval);
 				}else{
 					console.log('Next scheduled check for '+v.id+' in '+v.check_interval*1000);
