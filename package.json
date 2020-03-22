@@ -1,0 +1,21 @@
+{
+  "name": "pagewatcher",
+  "version": "1.0.0",
+  "description": "Watch web pages for changes and notify",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Bodo Minea",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-basic-auth": "^1.2.0",
+    "fs": "0.0.1-security",
+    "http": "0.0.0",
+    "mysql2": "^2.1.0",
+    "nodemailer": "^6.4.5",
+    "request": "^2.88.2",
+    "socket.io": "^1.7.3"
+  }
+}
