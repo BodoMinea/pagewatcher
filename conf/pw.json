@@ -9,7 +9,8 @@
                 "<< HTTP AUTH USERNAME >>" : "<< HTTP AUTH PASSWORD >>"
         },
         "server":{
-                "port":"5823"
+                "port": 5823,
+		"host": "<< THE URL YOU USE TO ACCESS THE WEBAPP HERE >>"
         },
         "mail":{
                 "transport": {
