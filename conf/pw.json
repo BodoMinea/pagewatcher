@@ -1,0 +1,27 @@
+{
+        "mysqldb": {
+                "host": "localhost",
+                "user": "<< MYSQL USER >>",
+                "password": "<< MYSQL DATABASE PASSWORD >>",
+                "database": "<< MYSQL DATABASE NAME >>"
+        },
+        "users":{
+                "<< HTTP AUTH USERNAME >>" : "<< HTTP AUTH PASSWORD >>"
+        },
+        "server":{
+                "port":"5823"
+        },
+        "mail":{
+                "transport": {
+                  "service": "gmail",
+                  "auth": {
+                    "user": "<< SMTP AUTH USERNAME >>",
+                    "pass": "<< SMTP AUTH PASSWORD >>"
+                  }
+                },
+                "options": {
+                  "from": "<< FROM EMAIL ADDRESS >>",
+                  "to": "<< TO EMAIL ADDRESS >>"
+                }
+        }
+}
