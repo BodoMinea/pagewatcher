@@ -29,14 +29,19 @@ const connection = mysql.createConnection(config.mysqldb);
 
 function sendEmail(obj){
 	mailoptions.subject="Page change alert for "+obj.friendly_name;
-	mailoptions.text="Page change alert triggered at "+new Date()+" for "+obj.friendly_name+" at URL "+obj.url+" by the PageWatcher instance at "+config.server.host;
+	mailoptions.text="PageWatcher change alert triggered at "+new Date()+" for "+obj.friendly_name+" at URL "+obj.url+" by the PageWatcher instance at "+config.server.host;
 
 	transporter.sendMail(mailoptions, function(error, info){
 	});
 }
 
-function sendWebhooks(){
-
+function sendWebhooks(obj){
+	for (var i = 0; i < config.webhooks.length; i++) {
+		if(config.webhooks[i].method=="GET"){
+			request(config.webhooks[i].url+"&"+config.webhooks[i].paramName+"=PageWatcher change alert for "+obj.friendly_name+(config.webhooks[i].url?" check "+obj.url:"!"),function (error, response, last_content){ });
+			console.log(config.webhooks[i].url+"&"+config.webhooks[i].paramName+"=PageWatcher change alert for "+obj.friendly_name+(config.webhooks[i].includeUrl?" check "+obj.url:"!"));
+		}
+	}
 }
 
 function sendSyshooks(){
@@ -149,7 +154,6 @@ io.on('connection', function(socket){
     	} else obj[data[i].name] = data[i].value;
     }
     request(obj.url, function (error, response, last_content) {
-    	console.log(obj.friendly_name,obj.url,obj.check_interval,obj.inexact_timing,obj.add_user,obj.add_ip,last_content,obj.alert_email,obj.alert_webhooks,obj.alert_syshooks);
     	connection.execute('INSERT INTO `watchers`(`friendly_name`,`url`,`check_interval`,`inexact_timing`,`add_user`,`add_ip`,`last_content`,`alert_email`,`alert_webhooks`,`alert_syshooks`) VALUES (?,?,?,?,?,?,?,?,?,?)', [obj.friendly_name,obj.url,obj.check_interval,obj.inexact_timing,obj.add_user,obj.add_ip,last_content,obj.alert_email,obj.alert_webhooks,obj.alert_syshooks], (err, rows) => {
 		  if(!err){
 		  	loadSendAll();
