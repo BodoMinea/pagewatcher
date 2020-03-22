@@ -29,7 +29,8 @@
 		{
 			"url": "<< YOUR URL THAT GETS AN GET /...&paramName=... >>",
 			"method": "GET",
-			"paramName": "text"
+			"paramName": "text",
+			"url": true
 		}
 	]
 }
