@@ -15,6 +15,11 @@ Make it easy to watch / subscribe to web pages for changes. Intended for simple 
 8. Configure your email transport and to/from addresses. Transport parameters are to be set as instructed in the Nodemailer docs - https://nodemailer.com/smtp/ or https://nodemailer.com/usage/using-gmail/
 9. Configure webhooks if you want. paramName is put with & at the end of the URL and populated with the alert message. Set includeUrl to true to include a link in the webhook message. Webhooks are great to notify a Slack group of a page change, blink your Sonoff-connected lights or send an SMS text message to your phone - which is actually how I use it. It works like a charm with the https://github.com/hetmann/node-sms-server project, calling it by GET request - and that uses the Gammu utility and a huawei e220 modem hooked up to a Raspberry Pi.
 10. Run... Profit¿ `node index.js` and point your browser to `http://localhost:5823` or whatever your port is set to.
+
+![Screenshot 1](chrome_DwHWWYKtcO.png "Screenshot 1")
+
+![Screenshot 2](chrome_ost2fK0nai.png "Screenshot 2")
+
 ## Recommendations
 To run this on the long term, I suggest you daemonize it with Forever - https://www.npmjs.com/package/forever. Nodemon or putting it in a screen probably work as well but may be less fault tolerant.
 ## To Do
