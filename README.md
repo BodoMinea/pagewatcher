@@ -23,5 +23,7 @@ To run this on the long term, I suggest you daemonize it with Forever - https://
 - keep a history of page changes
 - store webhook responses
 - user levels, groups, with separation and permissions
+- limit alert frequency per channel (especially SMS)
+- make strings / message contents easily customizable/parametrizable/translatable
 
 *You're welcome to contribute by Pull Request*
