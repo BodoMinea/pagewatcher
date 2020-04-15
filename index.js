@@ -40,6 +40,18 @@ function sendWebhooks(obj){
 		if(config.webhooks[i].method=="GET"){
 			request(config.webhooks[i].url+"&"+config.webhooks[i].paramName+"=PageWatcher change alert for "+obj.friendly_name+(config.webhooks[i].url?" check "+obj.url:"!"),function (error, response, last_content){ });
 			console.log(config.webhooks[i].url+"&"+config.webhooks[i].paramName+"=PageWatcher change alert for "+obj.friendly_name+(config.webhooks[i].includeUrl?" check "+obj.url:"!"));
+		}else if(config.webhooks[i].method=="POSTJSON"){
+			requestData = {};
+			requestData[config.webhooks[i].paramName] = "PageWatcher change alert for "+obj.friendly_name+(config.webhooks[i].url?" check "+obj.url:"!");
+			request({
+    				url: config.webhooks[i].url,
+    				method: "POST",
+    				json: requestData
+			})
+		}else if(config.webhooks[i].method=="POST"){
+			requestData = {};
+			requestData[config.webhooks[i].paramName] = "PageWatcher change alert for "+obj.friendly_name+(config.webhooks[i].url?" check "+obj.url:"!");
+			request.post(config.webhooks[i].url, {form: requestData})
 		}
 	}
 }
