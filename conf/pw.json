@@ -31,6 +31,13 @@
 			"method": "GET",
 			"paramName": "text",
 			"includeUrl": true
+		},
+		,
+		{
+		        "url": "<< YOUR URL THAT ACCEPTS HTTP POST >>",
+		        "method": "POSTJSON",
+		        "paramName": "text",
+		        "includeUrl": true
 		}
 	]
 }
